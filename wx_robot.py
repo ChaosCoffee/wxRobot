@@ -56,10 +56,13 @@ def add_friend(msg):
 @itchat.msg_register(TEXT, isGroupChat=True)
 def text_reply(msg):
     if msg.isAt:
-        print(msg.text)
-        str = msg.text
+        message = msg.text
         reply = ReplyData()
-        data = reply.find_reply_data(str)
+        if message.find('天气') != -1:#'天气'关键字判定
+            msg.user.send(u'@%s\u2005 %s' % (
+              msg.actualNickName, reply.find_weather_data(message)))
+            return
+        data = reply.find_reply_data(message)
         msg.user.send(u'@%s\u2005 %s' % (
             msg.actualNickName, data))
         
