@@ -18,7 +18,7 @@
 
 可以实现不同地区的天气预报
 
-![image](https://raw.githubusercontent.com/ChaosCoffee/wxRobot/master/docs/intro/image/weather.png =250)
+![image](https://raw.githubusercontent.com/ChaosCoffee/wxRobot/master/docs/intro/image/weather.png)
 
 
 
