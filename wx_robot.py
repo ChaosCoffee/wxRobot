@@ -4,39 +4,46 @@ import itchat, time
 import json
 from itchat.content import *
 from data.city import city
-from api.weather import *
+from api.wxapi import *
 
 class ReplyData:
-    def find_reply_data(self, str):
+    __message = ''
+
+    def __init__(self,message):
+        self.__message = message
+
+    def find_reply_data(self):
         with open('./reply/reply_data.json','r',encoding = 'utf-8') as f:
             s = f.read()
             data = json.loads(s)
             #print(data)
             for key in data:
-                if str.find(key) != -1:
+                if self.__message.find(key) != -1:
                    return data[key]
-                   
-            return data['default']
-            
-    def find_weather_data(self, str):
-        weather = Weather()
+            return self.__message
+
+    def reply_data(self):
+        if self.__message.find('天气') != -1: #天气关键字
+            return self.find_weather_data()
+        else: #命令模式
+            data = self.find_reply_data()
+            if data == self.__message:#robot API
+                return find_robot(self.__message)
+            return data
+
+    def find_weather_data(self):
         for key in city.keys():
-            if str.find(key) != -1:
-                weatherData = weather.query_weather(key)
-                return weatherData
-        weatherData = weather.query_weather('上海')
+            if self.__message.find(key) != -1:
+                return query_weather(key)
+        weatherData = query_weather('上海')#默认
         return weatherData
 
             
 @itchat.msg_register([TEXT, MAP, CARD, NOTE, SHARING])
 def text_reply(msg):
     if msg.type == TEXT:
-        message = msg.text
-        if message.find('天气') != -1:
-            reply = ReplyData()
-            msg.user.send(reply.find_weather_data(message))        
-        else:
-            msg.user.send('%s: %s' % ('我只会重复这句', msg.text))        
+        reply = ReplyData(msg.text)
+        msg.user.send('%s' % (reply.reply_data()))
     else:
         msg.user.send('%s: %s' % ('我只会重复这句', msg.text))
 
@@ -56,15 +63,9 @@ def add_friend(msg):
 @itchat.msg_register(TEXT, isGroupChat=True)
 def text_reply(msg):
     if msg.isAt:
-        message = msg.text
-        reply = ReplyData()
-        if message.find('天气') != -1:#'天气'关键字判定
-            msg.user.send(u'@%s\u2005 %s' % (
-              msg.actualNickName, reply.find_weather_data(message)))
-            return
-        data = reply.find_reply_data(message)
+        reply = ReplyData(msg.text)
         msg.user.send(u'@%s\u2005 %s' % (
-            msg.actualNickName, data))
+            msg.actualNickName, reply.reply_data()))
         
 itchat.auto_login(hotReload=True)
 itchat.run()
