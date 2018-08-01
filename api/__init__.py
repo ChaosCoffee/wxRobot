@@ -1,0 +1,1 @@
+from .wxapi import logger

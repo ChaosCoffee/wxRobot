@@ -4,6 +4,10 @@ import urllib.request
 import ssl
 import json
 import requests
+from config.config import configs
+
+_resContent = configs.keyword.K0003
+_apiKey = configs.robot.tuling.apiKey
 
 def find_robot(message):
     return message
@@ -20,18 +24,17 @@ def qingke_robot():
     #print(a)
     code = res['result']
     if code != 0:
-        return '晕了晕了,我需要休息一下。'
+        return _resContent
     content = res['content']
     return content
 
 def tuling_robot(message,userid):
-    apiUrl = 'http://www.tuling123.com/openapi/api'
     data = {
-        'key'    : 'apikey',
+        'key'    : _apiKey,
         'info'   : message, 
         'userid' : userid
     }
-    r = requests.post(apiUrl, data=data).json() #需要根据不同code返回
+    r = requests.post(configs.robot.tuling.apiUrl, data=data).json() #需要根据不同code返回
     msg = ''
     #print(r)
     if r['code'] == 100000: #文本
@@ -55,8 +58,8 @@ def tuling_robot(message,userid):
                 '抱歉，暂未找到图片' if menu['icon'] == "" else menu['icon'],
                 menu['info'],menu['detailurl'])
     elif r['40004'] == 40004:# 当天请求次数已使用完
-        msg = '我累了，不想回答，只想睡觉觉~'
-    return msg or '晕了晕了,我需要休息一下。'
+        msg = configs.keyword.K0004
+    return msg or _resContent
 
 if __name__ == "__main__":
     msg = tuling_robot('我想看新闻','wechat-robot')

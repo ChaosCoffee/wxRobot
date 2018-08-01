@@ -9,6 +9,7 @@ from api.wxapi import *
 import os
 import re
 import shutil
+from config.config import configs
 
 class ReplyData:
     __message = ''
@@ -19,7 +20,7 @@ class ReplyData:
         self.__username = username
 
     def find_reply_data(self):
-        with open('./reply/reply_data.json','r',encoding = 'utf-8') as f:
+        with open(configs.path.reply,'r',encoding = 'utf-8') as f:
             s = f.read()
             data = json.loads(s)
             for key in data:
@@ -28,7 +29,7 @@ class ReplyData:
             return self.__message
 
     def reply_data(self):
-        if self.__message.find('天气详情') != -1: #天气关键字
+        if self.__message.find(configs.keyword.K0001) != -1: #天气关键字
             return self.find_weather_data()
         else: #命令模式
             data = self.find_reply_data()
@@ -40,22 +41,22 @@ class ReplyData:
         for key in city.keys():
             if self.__message.find(key) != -1:
                 return query_weather(key)
-        weatherData = query_weather('上海')#默认
+        weatherData = query_weather(configs.keyword.K0002)#默认
         return weatherData
 
-downloadDir = './download/'
+downloadDir = configs.path.downloadDir
 
 @itchat.msg_register([TEXT, PICTURE, MAP, CARD, SHARING, RECORDING, ATTACHMENT, VIDEO])
 def text_reply(msg):
     handler_receive_msg(msg)
-    time.sleep(random.randint(4,10))
+    time.sleep(random.randint(configs.times.friend.start,configs.times.friend.end))
     if msg.type == TEXT:
         reply = ReplyData(msg.text,msg['FromUserName'])
         msg.user.send('%s' % (reply.reply_data()))
     elif msg.type == NOTE:
         pass
     elif msg.type == PICTURE or msg.type == RECORDING or msg.type == ATTACHMENT or msg.type == VIDEO:
-        time.sleep(random.randint(15,30))
+        time.sleep(random.randint(configs.times.download.start,configs.times.download.end))
         msg.download(downloadDir + msg.fileName)
     else:
         msg.user.send('%s: %s' % ('我只会重复这句', msg.text))
@@ -78,7 +79,7 @@ def add_friend(msg):
 @itchat.msg_register([TEXT, PICTURE, MAP, CARD, SHARING, RECORDING], isGroupChat=True)
 def text_reply(msg):
     handler_group_receive_msg(msg)
-    time.sleep(random.randint(6,12))
+    time.sleep(random.randint(configs.times.group.start,configs.times.group.end))
     if msg.isAt:
         reply = ReplyData(msg.text,msg.actualNickName)
         msg.user.send(u'@%s\u2005 %s' % (
@@ -91,7 +92,7 @@ def text_reply(msg):
 msg_dict = {}
 
 # 文件存储临时目录
-rev_tmp_dir = "./RevDir/"
+rev_tmp_dir = configs.path.revDir
 if not os.path.exists(rev_tmp_dir): os.mkdir(rev_tmp_dir)
 
 # 表情有一个问题 | 接受信息和接受note的msg_id不一致 巧合解决方案
@@ -172,7 +173,7 @@ def send_msg_helper(msg):
             if old_msg['msg_type'] == "Sharing": msg_body += "\n就是这个链接➣ " + old_msg.get('msg_share_url')
 
             # 将撤回消息发送到文件助手
-            time.sleep(random.randint(6,12))
+            time.sleep(random.randint(configs.times.withdraw.start,configs.times.withdraw.end))
             itchat.send(msg_body, toUserName='filehelper')
             # 有文件的话也要将文件发送回去
             if old_msg["msg_type"] == "Picture" \
@@ -188,7 +189,7 @@ def send_msg_helper(msg):
 #group chat
 msg_group_dict = {}
 # 文件存储临时目录
-rev_group_tmp_dir = "./RevDir/Group/"
+rev_group_tmp_dir = configs.path.revGroupDir
 
 if not os.path.exists(rev_group_tmp_dir): os.mkdir(rev_group_tmp_dir)
 
@@ -239,7 +240,8 @@ def handler_group_receive_msg(msg):
             }
         }
     )
-
+    
+_groupSender = configs.withdrawGroupMessage.sender
 @itchat.msg_register(NOTE,isGroupChat=True)
 def send_group_msg_helper(msg):
     print('群聊撤回消息处理...')
@@ -249,7 +251,7 @@ def send_group_msg_helper(msg):
         old_msg_id = re.search("\<msgid\>(.*?)\<\/msgid\>", msg['Content']).group(1)
         old_msg = msg_group_dict.get(old_msg_id, {})
         if len(old_msg_id) < 11:
-            itchat.send_file(rev_group_tmp_dir + face_bug, toUserName=msg['FromUserName'])
+            itchat.send_file(rev_group_tmp_dir + face_bug, toUserName=msg[_groupSender])
             os.remove(rev_group_tmp_dir + face_bug)
         else:
             msg_body = "告诉你一个秘密~" + "\n" \
@@ -262,15 +264,15 @@ def send_group_msg_helper(msg):
 
             # 将撤回消息发送到文件助手
             time.sleep(random.randint(6,12))
-            itchat.send(msg_body, toUserName=msg['FromUserName'])
+            itchat.send(msg_body, toUserName=msg[_groupSender])
             # 有文件的话也要将文件发送回去
             if old_msg["msg_type"] == "Picture" \
                     or old_msg["msg_type"] == "Recording":
                     #or old_msg["msg_type"] == "Video" \
                     #or old_msg["msg_type"] == "Attachment"
                 file = '@fil@%s' % (rev_group_tmp_dir + old_msg['msg_content'])
-                time.sleep(random.randint(6,12))
-                itchat.send(msg=file, toUserName=msg['FromUserName'])
+                time.sleep(random.randint(configs.times.withdraw.start,configs.times.withdraw.end))
+                itchat.send(msg=file, toUserName=msg[_groupSender])
                 os.remove(rev_group_tmp_dir + old_msg['msg_content'])
             # 删除字典旧消息
             msg_group_dict.pop(old_msg_id)
