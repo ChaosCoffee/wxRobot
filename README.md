@@ -57,8 +57,9 @@
 **3) 消息撤回**  
 监听消息撤回通知
 
+**配置文件**  
 
-
+见根目录下config文件目录下的config_default.py,支持被config_override.py覆盖配置
 
 
 
