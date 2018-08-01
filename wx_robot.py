@@ -45,14 +45,16 @@ class ReplyData:
         return weatherData
 
 downloadDir = configs.path.downloadDir
+_robotName = configs.robotName
 
 @itchat.msg_register([TEXT, PICTURE, MAP, CARD, SHARING, RECORDING, ATTACHMENT, VIDEO])
 def text_reply(msg):
     handler_receive_msg(msg)
     time.sleep(random.randint(configs.times.friend.start,configs.times.friend.end))
     if msg.type == TEXT:
-        reply = ReplyData(msg.text,msg['FromUserName'])
-        msg.user.send('%s' % (reply.reply_data()))
+        if msg.text.find("@" + _robotName) == -1:
+            reply = ReplyData(msg.text,msg['FromUserName'])
+            msg.user.send('%s' % (reply.reply_data()))
     elif msg.type == NOTE:
         pass
     elif msg.type == PICTURE or msg.type == RECORDING or msg.type == ATTACHMENT or msg.type == VIDEO:
@@ -81,7 +83,8 @@ def text_reply(msg):
     handler_group_receive_msg(msg)
     time.sleep(random.randint(configs.times.group.start,configs.times.group.end))
     if msg.isAt:
-        reply = ReplyData(msg.text,msg.actualNickName)
+        mess = msg.text.replace("@" + _robotName,"") #处理信息应不包括@name
+        reply = ReplyData(mess,msg.actualNickName)
         msg.user.send(u'@%s\u2005 %s' % (
             msg.actualNickName, reply.reply_data()))
     if msg.type == NOTE:#撤回通知

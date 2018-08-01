@@ -6,6 +6,7 @@ Default configurations.
 
 configs = {
     'debug': True,
+    'robotName': '二蛋',
     'times': {
         'friend': {
             'start': 4,
