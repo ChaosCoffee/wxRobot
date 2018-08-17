@@ -11,6 +11,7 @@ import re
 import shutil
 from config.config import configs
 
+_robotSwitch = True
 class ReplyData:
     __message = ''
     __username = ''
@@ -52,7 +53,11 @@ def text_reply(msg):
     handler_receive_msg(msg)
     time.sleep(random.randint(configs.times.friend.start,configs.times.friend.end))
     if msg.type == TEXT:
-        if msg.text.find("@" + _robotName) == -1 and msg.text[0] != '.':
+        #robot全局开关 True: 则自动回复 False: 不予回复
+        global _robotSwitch
+        robotS = robot_switch(msg.text)
+        _robotSwitch = robotS
+        if msg.text.find("@" + _robotName) == -1 and msg.text[0] != '.' and _robotSwitch:
             reply = ReplyData(msg.text,msg['FromUserName'])
             msg.user.send('%s' % (reply.reply_data()))
     elif msg.type == NOTE:
@@ -279,6 +284,14 @@ def send_group_msg_helper(msg):
                 os.remove(rev_group_tmp_dir + old_msg['msg_content'])
             # 删除字典旧消息
             msg_group_dict.pop(old_msg_id)
+
+def robot_switch(transMsg):
+    if transMsg == configs.robot.closeSwitch:
+        return False
+    elif transMsg == configs.robot.openSwitch:
+        return True
+    else:
+        return _robotSwitch
 
 def lc():
     schedule_task('群消息自动回复任务')

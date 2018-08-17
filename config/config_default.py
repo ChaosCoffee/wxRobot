@@ -58,6 +58,8 @@ configs = {
         'sender': 'FromUserName'#FromUserName 发送者，filehelper 文件助手      
     },
     'robot': {
+        'openSwitch': "OPEN ROBOT NOW",
+        'closeSwitch': "CLOSE ROBOT NOW",
         'userRobot': 'tuling', 
         'tuling': {
             'apiUrl': 'http://www.tuling123.com/openapi/api',
