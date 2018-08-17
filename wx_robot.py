@@ -52,7 +52,7 @@ def text_reply(msg):
     handler_receive_msg(msg)
     time.sleep(random.randint(configs.times.friend.start,configs.times.friend.end))
     if msg.type == TEXT:
-        if msg.text.find("@" + _robotName) == -1:
+        if msg.text.find("@" + _robotName) == -1 and msg.text[0] != '.':
             reply = ReplyData(msg.text,msg['FromUserName'])
             msg.user.send('%s' % (reply.reply_data()))
     elif msg.type == NOTE:

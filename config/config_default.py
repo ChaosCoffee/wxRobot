@@ -58,6 +58,7 @@ configs = {
         'sender': 'FromUserName'#FromUserName 发送者，filehelper 文件助手      
     },
     'robot': {
+        'userRobot': 'tuling', 
         'tuling': {
             'apiUrl': 'http://www.tuling123.com/openapi/api',
             'apiKey': 'awadafaswad213154456sasdad'

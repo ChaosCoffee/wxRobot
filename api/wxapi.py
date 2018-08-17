@@ -16,6 +16,7 @@ logger.addHandler(fh) # logger添加文件输出流
 logger.addHandler(sh) # logger添加标准输出流（std out）
 logger.setLevel(logging.INFO) # 设置从那个等级开始提示
 _resContent = configs.keyword.K0003
+_useRobot = configs.robot.useRobot
 
 def log(apiname):
     def decorator(func):
@@ -32,11 +33,10 @@ def log(apiname):
 @log('RobotAPI')
 def find_robot(message,userid):
     content = ''
-    useRobot = 2
     try: 
-        if useRobot == 1: 
+        if _useRobot == 'tuling': 
             content = robot.qingke_robot(message).replace("{br}","\n").replace("菲菲","二蛋")
-        elif useRobot == 2:
+        elif _useRobot == 'qingke':
             content = robot.tuling_robot(message,userid)
         else:
             content = _resContent
