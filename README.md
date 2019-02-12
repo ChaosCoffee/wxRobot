@@ -18,7 +18,7 @@
 
 <!-- /TOC -->
 ## wxRobot文档
-[wxRobot文档](https://github.com/ChaosCoffee/wxRobot)
+[wxRobot文档](https://github.com/ChaosCoffee/wxRobot/wiki)
 
 ## itchat
 采用开源ItChat，使用Python调用微信接口，API文档如下
