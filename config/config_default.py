@@ -60,7 +60,7 @@ configs = {
     'robot': {
         'openSwitch': "OPEN ROBOT NOW",
         'closeSwitch': "CLOSE ROBOT NOW",
-        'userRobot': 'tuling', 
+        'useRobot': 'tuling', 
         'tuling': {
             'apiUrl': 'http://www.tuling123.com/openapi/api',
             'apiKey': 'awadafaswad213154456sasdad'
